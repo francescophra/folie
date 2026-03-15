@@ -20,11 +20,21 @@
 
       body {
         font-family: "SF Mono", "Fira Code", monospace;
-        font-size: 11px;
+        font-size: 10px;
         background: #979797;
         color: #111;
-        letter-spacing: 0.04em;
         min-height: 100dvh;
+      }
+
+      .logo {
+        display: flex;
+        align-items: start;
+        max-width: 100%;
+        margin-bottom: 20px;
+      }
+
+      .logo svg {
+        height: 100%;
       }
 
       .card {
@@ -34,11 +44,10 @@
         width: calc(var(--fl-span) * (100vw - 2 * var(--fl-margin) - (var(--fl-columns) - 1) * var(--fl-gutter)) / var(--fl-columns) + (var(--fl-span) - 1) * var(--fl-gutter));
         background: #fff;
         /* border-radius: 10px; */
-        padding: 20px;
+        padding: 1vw;
       }
 
       .title {
-        font-size: 11px;
         color: #aaa;
         margin-bottom: 20px;
         text-transform: uppercase;
@@ -71,26 +80,24 @@
         gap: 24px;
       }
 
-      button:hover {
+      .card button:hover {
         background: #e0e0e0;
         color: #555;
       }
-      button.active {
+      .card button.active {
         background: #111;
         color: #fff;
       }
 
       .btn-name {
-        font-size: 11px;
         text-transform: uppercase;
       }
       .btn-meta {
-        font-size: 10px;
         opacity: 0.5;
         text-align: right;
         white-space: nowrap;
       }
-      button.active .btn-meta {
+      .card button.active .btn-meta {
         opacity: 0.4;
       }
 
@@ -98,7 +105,6 @@
         display: flex;
         gap: 12px;
         color: #000;
-        font-size: 10px;
         text-transform: uppercase;
       }
 
@@ -113,10 +119,17 @@
   </head>
   <body>
     <div class="card">
-      <p class="title">
-        <strong>Folie</strong>
-        — ctrl+g to toggle
-      </p>
+      <div class="logo">
+        <svg width="637" height="247" viewBox="0 0 637 247" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M0 242.917V0H159.563V27.2176H32.3209V104.448H143.913V131.665H32.3209V242.917H0Z" fill="black" />
+          <path d="M153.854 155.141C153.854 103.427 183.453 62.9408 239.249 62.9408C295.045 62.9408 324.645 103.427 324.645 155.141C324.645 206.514 295.045 247 239.249 247C183.453 247 153.854 206.514 153.854 155.141ZM184.474 155.141C184.474 197.668 208.97 221.483 239.249 221.483C269.529 221.483 294.025 197.668 294.025 155.141C294.025 112.273 269.529 88.4573 239.249 88.4573C208.97 88.4573 184.474 112.273 184.474 155.141Z" fill="black" />
+          <path d="M333.225 242.917V0H362.143V242.917H333.225Z" fill="black" />
+          <path d="M381.427 242.917V67.0234H410.346V242.917H381.427ZM410.346 0V35.3829H381.427V0H410.346Z" fill="black" />
+          <path d="M549.387 187.121H577.965C570.14 225.906 542.242 247 502.777 247C446.64 247 420.103 208.215 418.402 154.46C418.402 101.726 453.104 62.9408 501.075 62.9408C563.336 62.9408 582.388 121.118 580.687 163.646H449.022C448.001 194.266 465.352 221.483 503.797 221.483C527.613 221.483 544.283 209.916 549.387 187.121ZM449.022 138.129H550.067C548.706 110.572 527.953 88.4573 499.374 88.4573C469.095 88.4573 451.063 111.252 449.022 138.129Z" fill="black" />
+          <path d="M601 0H637V36H601V0Z" fill="black" />
+        </svg>
+      </div>
+      <p class="title">— ctrl+g to toggle</p>
 
       <div class="presets">
         <button class="active" data-cols="6" data-gutter="20px" data-span="1">
@@ -134,13 +147,9 @@
       </div>
 
       <footer>
-        <span>~6kb</span>
-        <span>•</span>
-        <span>zero deps</span>
+        <span>©2026</span>
         <span>•</span>
         <a href="https://github.com/francescophra/folie" target="_blank">github</a>
-        <span>•</span>
-        <a href="https://npmjs.com/package/folie-grid" target="_blank">npm</a>
       </footer>
     </div>
 
@@ -176,7 +185,7 @@
 
       window.addEventListener("resize", updateSpan);
 
-      document.querySelectorAll("button").forEach((btn) => {
+      document.querySelectorAll(".presets button").forEach((btn) => {
         btn.addEventListener("click", () => {
           document.querySelectorAll("button").forEach((b) => b.classList.remove("active"));
           btn.classList.add("active");
