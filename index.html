@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Folie</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      :root {
+        --fl-columns: 12;
+        --fl-gutter: 20px;
+        --fl-margin: 20px;
+        --fl-span: 2;
+      }
+
+      body {
+        font-family: "SF Mono", "Fira Code", monospace;
+        font-size: 11px;
+        background: #979797;
+        color: #111;
+        letter-spacing: 0.04em;
+        min-height: 100dvh;
+      }
+
+      .card {
+        position: fixed;
+        top: var(--fl-margin);
+        left: var(--fl-margin);
+        width: calc(var(--fl-span) * (100vw - 2 * var(--fl-margin) - (var(--fl-columns) - 1) * var(--fl-gutter)) / var(--fl-columns) + (var(--fl-span) - 1) * var(--fl-gutter));
+        background: #fff;
+        /* border-radius: 10px; */
+        padding: 20px;
+      }
+
+      .title {
+        font-size: 11px;
+        color: #aaa;
+        margin-bottom: 20px;
+        text-transform: uppercase;
+      }
+
+      .title strong {
+        color: #111;
+      }
+
+      .presets {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        margin-bottom: 24px;
+      }
+
+      button {
+        all: unset;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 9px 12px;
+        /* border-radius: 5px; */
+        background: #ebebeb;
+        color: #aaa;
+        transition:
+          background 0.1s,
+          color 0.1s;
+        gap: 24px;
+      }
+
+      button:hover {
+        background: #e0e0e0;
+        color: #555;
+      }
+      button.active {
+        background: #111;
+        color: #fff;
+      }
+
+      .btn-name {
+        font-size: 11px;
+        text-transform: uppercase;
+      }
+      .btn-meta {
+        font-size: 10px;
+        opacity: 0.5;
+        text-align: right;
+        white-space: nowrap;
+      }
+      button.active .btn-meta {
+        opacity: 0.4;
+      }
+
+      footer {
+        display: flex;
+        gap: 12px;
+        color: #000;
+        font-size: 10px;
+        text-transform: uppercase;
+      }
+
+      footer a {
+        color: #000;
+        text-decoration: none;
+      }
+      footer a:hover {
+        color: #111;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <p class="title">
+        <strong>Folie</strong>
+        — ctrl+g to toggle
+      </p>
+
+      <div class="presets">
+        <button class="active" data-cols="6" data-gutter="20px" data-span="1">
+          <span class="btn-name">6 col</span>
+          <span class="btn-meta">20px / 20px</span>
+        </button>
+        <button data-cols="12" data-gutter="20px" data-span="2">
+          <span class="btn-name">12 col</span>
+          <span class="btn-meta">20px / 20px</span>
+        </button>
+        <button data-cols="24" data-gutter="20px" data-span="4">
+          <span class="btn-name">24 col</span>
+          <span class="btn-meta">20px / 20px</span>
+        </button>
+      </div>
+
+      <footer>
+        <span>~6kb</span>
+        <span>•</span>
+        <span>zero deps</span>
+        <span>•</span>
+        <a href="https://github.com/francescophra/folie" target="_blank">github</a>
+        <span>•</span>
+        <a href="https://npmjs.com/package/folie-grid" target="_blank">npm</a>
+      </footer>
+    </div>
+
+    <script type="module">
+      import Folie from "./index.js";
+
+      const root = document.documentElement.style;
+      let instance;
+      let currentCols = 6;
+
+      // Keep span/cols = 1/6 at all breakpoints so card width stays constant.
+      // desktop: cols/6 — tablet: cols/3 — mobile: cols*2/3
+      function spanForCols(cols) {
+        if (window.innerWidth <= 767) return Math.round((cols * 2) / 3);
+        if (window.innerWidth <= 1023) return Math.round(cols / 3);
+        return Math.round(cols / 6);
+      }
+
+      function updateSpan() {
+        root.setProperty("--fl-span", spanForCols(currentCols));
+      }
+
+      function build(cols, gutter) {
+        currentCols = +cols;
+        instance?.destroy();
+        instance = new Folie({columns: currentCols, gutter, margin: "20px"}).mount();
+        root.setProperty("--fl-columns", cols);
+        root.setProperty("--fl-gutter", gutter);
+        updateSpan();
+      }
+
+      build("6", "20px");
+
+      window.addEventListener("resize", updateSpan);
+
+      document.querySelectorAll("button").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          document.querySelectorAll("button").forEach((b) => b.classList.remove("active"));
+          btn.classList.add("active");
+          build(btn.dataset.cols, btn.dataset.gutter);
+        });
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,35 @@
+{
+  "name": "folie-grid",
+  "version": "0.1.1",
+  "description": "Figma layout grid overlay for the browser — zero-dependency, framework agnostic",
+  "type": "module",
+  "main": "./index.js",
+  "module": "./index.js",
+  "exports": {
+    ".": "./index.js"
+  },
+  "files": [
+    "index.js"
+  ],
+  "keywords": [
+    "figma",
+    "grid",
+    "layout",
+    "overlay",
+    "dev-tool",
+    "columns",
+    "design"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/francescophra/folie.git"
+  },
+  "bugs": {
+    "url": "https://github.com/francescophra/folie/issues"
+  },
+  "homepage": "https://github.com/francescophra/folie#readme",
+  "publishConfig": {
+    "access": "public"
+  }
+}
