@@ -32,17 +32,17 @@ interface ResolvedOptions {
 }
 
 export class Folie {
-  private _options: ResolvedOptions
-  private _wrapper: HTMLElement | null = null
-  private _styleEl: HTMLStyleElement | null = null
-  private _toggleBtn: HTMLButtonElement | null = null
-  private _visible = false
-  private _shortcut: ParsedShortcut
-  private _mql: Array<{mql: MediaQueryList; cfg: BreakpointConfig}> = []
-  private _ac: AbortController | null = null
+  private options: ResolvedOptions
+  private wrapper: HTMLElement | null = null
+  private styleEl: HTMLStyleElement | null = null
+  private toggleBtn: HTMLButtonElement | null = null
+  private visible = false
+  private shortcut: ParsedShortcut
+  private mql: Array<{mql: MediaQueryList; cfg: BreakpointConfig}> = []
+  private ac: AbortController | null = null
 
-  constructor(options: FolieOptions = {}) {
-    const {columns, gutter, margin, breakpoints, ...rest} = options
+  constructor(opts: FolieOptions = {}) {
+    const {columns, gutter, margin, breakpoints, ...rest} = opts
 
     let resolvedBreakpoints: Record<string, BreakpointConfig>
     if (breakpoints) {
@@ -59,65 +59,65 @@ export class Folie {
       resolvedBreakpoints = DEFAULTS.breakpoints
     }
 
-    this._options = {...DEFAULTS, ...rest, breakpoints: resolvedBreakpoints}
-    this._shortcut = this._parseShortcut(this._options.shortcut)
+    this.options = {...DEFAULTS, ...rest, breakpoints: resolvedBreakpoints}
+    this.shortcut = this.parseShortcut(this.options.shortcut)
   }
 
   mount(container: HTMLElement = document.body): this {
-    if (this._wrapper) return this
-    this._ac = new AbortController()
-    this._injectStyles()
-    this._createDOM(container)
-    if (this._options.toggleButton) this._createToggleButton()
-    this._setupMediaQueries()
-    this._options.showOnStart ? this._show() : this._hide()
+    if (this.wrapper) return this
+    this.ac = new AbortController()
+    this.injectStyles()
+    this.createDOM(container)
+    if (this.options.toggleButton) this.createToggleButton()
+    this.setupMediaQueries()
+    this.options.showOnStart ? this.show() : this.hide()
     return this
   }
 
   destroy(): void {
-    this._ac?.abort()
-    this._ac = null
-    this._mql = []
-    this._wrapper?.remove()
-    this._styleEl?.remove()
-    this._toggleBtn?.remove()
-    this._wrapper = null
-    this._styleEl = null
-    this._toggleBtn = null
-    this._visible = false
+    this.ac?.abort()
+    this.ac = null
+    this.mql = []
+    this.wrapper?.remove()
+    this.styleEl?.remove()
+    this.toggleBtn?.remove()
+    this.wrapper = null
+    this.styleEl = null
+    this.toggleBtn = null
+    this.visible = false
   }
 
   // --- private ---
 
-  private _show(): void {
-    if (this._wrapper) {
-      this._wrapper.style.display = ''
-      this._visible = true
+  private show(): void {
+    if (this.wrapper) {
+      this.wrapper.style.display = ''
+      this.visible = true
     }
   }
 
-  private _hide(): void {
-    if (this._wrapper) {
-      this._wrapper.style.display = 'none'
-      this._visible = false
+  private hide(): void {
+    if (this.wrapper) {
+      this.wrapper.style.display = 'none'
+      this.visible = false
     }
   }
 
-  private _toggle(): void {
-    this._visible ? this._hide() : this._show()
+  private toggle(): void {
+    this.visible ? this.hide() : this.show()
   }
 
-  private _createDOM(container: HTMLElement): void {
-    this._wrapper = document.createElement('div')
-    this._wrapper.className = 'fl-wrapper'
-    this._wrapper.setAttribute('aria-hidden', 'true')
-    this._wrapper.style.zIndex = String(this._options.zIndex)
-    container.appendChild(this._wrapper)
+  private createDOM(container: HTMLElement): void {
+    this.wrapper = document.createElement('div')
+    this.wrapper.className = 'fl-wrapper'
+    this.wrapper.setAttribute('aria-hidden', 'true')
+    this.wrapper.style.zIndex = String(this.options.zIndex)
+    container.appendChild(this.wrapper)
   }
 
-  private _injectStyles(): void {
-    this._styleEl = document.createElement('style')
-    this._styleEl.textContent = [
+  private injectStyles(): void {
+    this.styleEl = document.createElement('style')
+    this.styleEl.textContent = [
       '.fl-wrapper {',
       '  position: fixed;',
       '  inset: 0;',
@@ -143,26 +143,26 @@ export class Folie {
       '  border: none;',
       '  cursor: pointer;',
       '  padding: 0;',
-      `  z-index: ${DEFAULTS.zIndex};`,
+      `  z-index: ${this.options.zIndex};`,
       '}',
     ].join('\n')
-    document.head.appendChild(this._styleEl)
+    document.head.appendChild(this.styleEl)
   }
 
-  private _createToggleButton(): void {
+  private createToggleButton(): void {
     const btn = document.createElement('button')
     btn.className = 'fl-toggle'
     btn.type = 'button'
     btn.setAttribute('aria-label', 'Toggle grid')
-    btn.style.setProperty('--fl-color', this._options.color)
-    btn.style.setProperty('--fl-opacity', String(this._options.opacity))
-    btn.addEventListener('click', () => this._toggle(), {signal: this._ac!.signal})
+    btn.style.setProperty('--fl-color', this.options.color)
+    btn.style.setProperty('--fl-opacity', String(this.options.opacity))
+    btn.addEventListener('click', () => this.toggle(), {signal: this.ac!.signal})
     document.body.appendChild(btn)
-    this._toggleBtn = btn
+    this.toggleBtn = btn
   }
 
-  private _buildRangeQueries(): Array<{query: string; cfg: BreakpointConfig}> {
-    const values = Object.values(this._options.breakpoints)
+  private buildRangeQueries(): Array<{query: string; cfg: BreakpointConfig}> {
+    const values = Object.values(this.options.breakpoints)
     const bounded = values
       .filter((cfg): cfg is BreakpointConfig & {until: number} => cfg.until !== undefined)
       .sort((a, b) => a.until - b.until)
@@ -186,58 +186,58 @@ export class Folie {
     return ranges
   }
 
-  private _setupMediaQueries(): void {
-    const {signal} = this._ac!
+  private setupMediaQueries(): void {
+    const {signal} = this.ac!
 
-    this._mql = this._buildRangeQueries().map(({query, cfg}) => ({
+    this.mql = this.buildRangeQueries().map(({query, cfg}) => ({
       mql: window.matchMedia(query),
       cfg,
     }))
 
-    const initial = this._mql.find(({mql}) => mql.matches)
-    if (initial) this._applyBreakpoint(initial.cfg)
+    const initial = this.mql.find(({mql}) => mql.matches) ?? this.mql[this.mql.length - 1]
+    if (initial) this.applyBreakpoint(initial.cfg)
 
-    for (const {mql, cfg} of this._mql) {
+    for (const {mql, cfg} of this.mql) {
       mql.addEventListener(
         'change',
         (e) => {
-          if (e.matches) this._applyBreakpoint(cfg)
+          if (e.matches) this.applyBreakpoint(cfg)
         },
         {signal},
       )
     }
 
-    window.addEventListener('keydown', (e) => this._handleKeydown(e), {signal})
+    window.addEventListener('keydown', (e) => this.handleKeydown(e), {signal})
   }
 
-  private _applyBreakpoint(cfg: BreakpointConfig): void {
-    if (!this._wrapper) return
-    const s = this._wrapper.style
+  private applyBreakpoint(cfg: BreakpointConfig): void {
+    if (!this.wrapper) return
+    const s = this.wrapper.style
     s.setProperty('--fl-columns', String(cfg.columns))
     s.setProperty('--fl-gutter', cfg.gutter)
     s.setProperty('--fl-margin', cfg.margin)
-    s.setProperty('--fl-color', this._options.color)
-    s.setProperty('--fl-opacity', String(this._options.opacity))
+    s.setProperty('--fl-color', this.options.color)
+    s.setProperty('--fl-opacity', String(this.options.opacity))
 
-    if (this._wrapper.childElementCount === cfg.columns) return
+    if (this.wrapper.childElementCount === cfg.columns) return
     const frag = document.createDocumentFragment()
     for (let i = 0; i < cfg.columns; i++) {
       const col = document.createElement('div')
       col.className = 'fl-col'
       frag.appendChild(col)
     }
-    this._wrapper.replaceChildren(frag)
+    this.wrapper.replaceChildren(frag)
   }
 
-  private _handleKeydown(e: KeyboardEvent): void {
-    const {ctrl, shift, alt, key} = this._shortcut
+  private handleKeydown(e: KeyboardEvent): void {
+    const {ctrl, shift, alt, key} = this.shortcut
     if (ctrl !== e.ctrlKey || shift !== e.shiftKey || alt !== e.altKey) return
     if (e.key.toLowerCase() !== key) return
     e.preventDefault()
-    this._toggle()
+    this.toggle()
   }
 
-  private _parseShortcut(shortcut: string): ParsedShortcut {
+  private parseShortcut(shortcut: string): ParsedShortcut {
     const parts = shortcut
       .toLowerCase()
       .split('+')

@@ -95,7 +95,7 @@ export class Folie {
 
   _injectStyles() {
     this._styleEl = document.createElement("style");
-    this._styleEl.textContent = [".fl-wrapper {", "  position: fixed;", "  inset: 0;", "  pointer-events: none;", "  display: grid;", "  grid-template-columns: repeat(var(--fl-columns), 1fr);", "  gap: var(--fl-gutter);", "  padding: 0 var(--fl-margin);", "}", ".fl-col {", "  height: 100%;", "  background: var(--fl-color);", "  opacity: var(--fl-opacity);", "}", ".fl-toggle {", "  position: fixed;", "  bottom: 0px;", "  left: 0px;", "  width: 40px;", "  height: 40px;", "  background: var(--fl-color);", "  opacity: 0.5;", "  border: none;", "  cursor: pointer;", "  padding: 0;", `  z-index: ${DEFAULTS.zIndex};`, "}"].join("\n");
+    this._styleEl.textContent = [".fl-wrapper {", "  position: fixed;", "  inset: 0;", "  pointer-events: none;", "  display: grid;", "  grid-template-columns: repeat(var(--fl-columns), 1fr);", "  gap: var(--fl-gutter);", "  padding: 0 var(--fl-margin);", "}", ".fl-col {", "  height: 100%;", "  background: var(--fl-color);", "  opacity: var(--fl-opacity);", "}", ".fl-toggle {", "  position: fixed;", "  bottom: 0px;", "  left: 0px;", "  width: 40px;", "  height: 40px;", "  background: var(--fl-color);", "  opacity: 0.5;", "  border: none;", "  cursor: pointer;", "  padding: 0;", `  z-index: ${this._options.zIndex};`, "}"].join("\n");
     document.head.appendChild(this._styleEl);
   }
 
@@ -143,7 +143,7 @@ export class Folie {
     }));
 
     // Apply the currently-matching breakpoint immediately
-    const initial = this._mql.find(({mql}) => mql.matches);
+    const initial = this._mql.find(({mql}) => mql.matches) ?? this._mql[this._mql.length - 1];
     if (initial) this._applyBreakpoint(initial.cfg);
 
     // Fire on future boundary crossings only (e.matches guards the exit event)
