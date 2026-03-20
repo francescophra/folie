@@ -4,6 +4,8 @@ const DEFAULTS = {
   margin: "20px",
   color: "#ff0000",
   opacity: 0.1,
+  rowColor: "#ff0000",
+  rowOpacity: 0.1,
   zIndex: 2147483647,
   shortcut: "ctrl+g",
   showOnStart: true,
@@ -13,7 +15,7 @@ const DEFAULTS = {
 
 class Folie {
   constructor(options = {}) {
-    const {columns, gutter, margin, breakpoints, ...rest} = options;
+    const {columns, gutter, margin, row, rowGutter, rowMargin, rowColor, rowOpacity, breakpoints, ...rest} = options;
 
     const hasShorthand = columns !== undefined || gutter !== undefined || margin !== undefined;
     const hasBreakpoints = breakpoints !== undefined && Object.keys(breakpoints).length > 0;
@@ -48,11 +50,23 @@ class Folie {
       resolvedBreakpoints = breakpoints;
     }
 
+    if (row !== undefined) resolvedBase.row = row;
+    if (rowGutter !== undefined) resolvedBase.rowGutter = rowGutter;
+    if (rowMargin !== undefined) resolvedBase.rowMargin = rowMargin;
+
     const mode = rest.mode ?? 'fill';
     const opacity = rest.opacity ?? (mode === 'outline' ? 0.5 : DEFAULTS.opacity);
-    this._options = {...DEFAULTS, ...rest, base: resolvedBase, breakpoints: resolvedBreakpoints, mode, opacity};
+    this._options = {
+      ...DEFAULTS, ...rest,
+      base: resolvedBase,
+      breakpoints: resolvedBreakpoints,
+      mode, opacity,
+      rowColor: rowColor ?? DEFAULTS.rowColor,
+      rowOpacity: rowOpacity ?? DEFAULTS.rowOpacity,
+    };
     this._shortcut = this._parseShortcut(this._options.shortcut);
     this._wrapper = null;
+    this._rowWrapper = null;
     this._styleEl = null;
     this._toggleBtn = null;
     this._visible = false;
@@ -76,9 +90,11 @@ class Folie {
     this._ac = null;
     this._mql = [];
     this._wrapper?.remove();
+    this._rowWrapper?.remove();
     this._styleEl?.remove();
     this._toggleBtn?.remove();
     this._wrapper = null;
+    this._rowWrapper = null;
     this._styleEl = null;
     this._toggleBtn = null;
     this._visible = false;
@@ -91,6 +107,7 @@ class Folie {
       this._wrapper.style.display = "";
       this._visible = true;
     }
+    if (this._rowWrapper) this._rowWrapper.style.display = "";
   }
 
   _hide() {
@@ -98,6 +115,7 @@ class Folie {
       this._wrapper.style.display = "none";
       this._visible = false;
     }
+    if (this._rowWrapper) this._rowWrapper.style.display = "none";
   }
 
   _toggle() {
@@ -111,11 +129,19 @@ class Folie {
     this._wrapper.style.zIndex = String(this._options.zIndex);
     if (this._options.mode === 'outline') this._wrapper.dataset.flMode = 'outline';
     container.appendChild(this._wrapper);
+
+    if (this._options.base.row !== undefined) {
+      this._rowWrapper = document.createElement("div");
+      this._rowWrapper.className = "fl-row-wrapper";
+      this._rowWrapper.setAttribute("aria-hidden", "true");
+      this._rowWrapper.style.zIndex = String(this._options.zIndex);
+      container.appendChild(this._rowWrapper);
+    }
   }
 
   _injectStyles() {
     this._styleEl = document.createElement("style");
-    this._styleEl.textContent = [".fl-wrapper {", "  position: fixed;", "  inset: 0;", "  pointer-events: none;", "  display: grid;", "  grid-template-columns: repeat(var(--fl-columns), 1fr);", "  gap: var(--fl-gutter);", "  padding: 0 var(--fl-margin);", "}", ".fl-col {", "  height: 100%;", "  background: var(--fl-color);", "  opacity: var(--fl-opacity);", "}", ".fl-toggle {", "  position: fixed;", "  bottom: 0px;", "  left: 0px;", "  width: 40px;", "  height: 40px;", "  background: var(--fl-color);", "  opacity: 0.5;", "  border: none;", "  cursor: pointer;", "  padding: 0;", `  z-index: ${this._options.zIndex};`, "}", ".fl-wrapper[data-fl-mode=\"outline\"] .fl-col {", "  background: transparent;", "  box-shadow: inset 1px 0 0 0 var(--fl-color), inset -1px 0 0 0 var(--fl-color);", "}"].join("\n");
+    this._styleEl.textContent = [".fl-wrapper {", "  position: fixed;", "  inset: 0;", "  pointer-events: none;", "  display: grid;", "  grid-template-columns: repeat(var(--fl-columns), 1fr);", "  gap: var(--fl-gutter);", "  padding: 0 var(--fl-margin);", "}", ".fl-col {", "  height: 100%;", "  background: var(--fl-color);", "  opacity: var(--fl-opacity);", "}", ".fl-row-wrapper {", "  position: fixed;", "  inset: 0;", "  pointer-events: none;", "  display: grid;", "  grid-template-rows: repeat(var(--fl-rows), 1fr);", "  gap: var(--fl-row-gutter);", "  padding: var(--fl-row-margin) 0;", "}", ".fl-row {", "  width: 100%;", "  background: var(--fl-row-color);", "  opacity: var(--fl-row-opacity);", "}", ".fl-toggle {", "  position: fixed;", "  bottom: 0px;", "  left: 0px;", "  width: 40px;", "  height: 40px;", "  background: var(--fl-color);", "  opacity: 0.5;", "  border: none;", "  cursor: pointer;", "  padding: 0;", `  z-index: ${this._options.zIndex};`, "}", ".fl-wrapper[data-fl-mode=\"outline\"] .fl-col {", "  background: transparent;", "  box-shadow: inset 1px 0 0 0 var(--fl-color), inset -1px 0 0 0 var(--fl-color);", "}"].join("\n");
     document.head.appendChild(this._styleEl);
   }
 
@@ -182,14 +208,34 @@ class Folie {
     s.setProperty("--fl-color", this._options.color);
     s.setProperty("--fl-opacity", String(this._options.opacity));
 
-    if (this._wrapper.childElementCount === cfg.columns) return;
-    const frag = document.createDocumentFragment();
-    for (let i = 0; i < cfg.columns; i++) {
-      const col = document.createElement("div");
-      col.className = "fl-col";
-      frag.appendChild(col);
+    if (this._wrapper.childElementCount !== cfg.columns) {
+      const frag = document.createDocumentFragment();
+      for (let i = 0; i < cfg.columns; i++) {
+        const col = document.createElement("div");
+        col.className = "fl-col";
+        frag.appendChild(col);
+      }
+      this._wrapper.replaceChildren(frag);
     }
-    this._wrapper.replaceChildren(frag);
+
+    if (this._rowWrapper && cfg.row !== undefined) {
+      const rs = this._rowWrapper.style;
+      rs.setProperty("--fl-rows", String(cfg.row));
+      rs.setProperty("--fl-row-gutter", cfg.rowGutter);
+      rs.setProperty("--fl-row-margin", cfg.rowMargin);
+      rs.setProperty("--fl-row-color", this._options.rowColor);
+      rs.setProperty("--fl-row-opacity", String(this._options.rowOpacity));
+
+      if (this._rowWrapper.childElementCount !== cfg.row) {
+        const frag = document.createDocumentFragment();
+        for (let i = 0; i < cfg.row; i++) {
+          const row = document.createElement("div");
+          row.className = "fl-row";
+          frag.appendChild(row);
+        }
+        this._rowWrapper.replaceChildren(frag);
+      }
+    }
   }
 
   _handleKeydown(e) {

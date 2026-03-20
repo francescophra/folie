@@ -2,12 +2,20 @@ export interface BreakpointConfig {
   columns?: number
   gutter?: Spacer
   margin?: Spacer
+  row?: number
+  rowGutter?: Spacer
+  rowMargin?: Spacer
 }
 
 export interface FolieOptions {
   columns?: number
   gutter?: Spacer
   margin?:  Spacer
+  row?: number
+  rowGutter?: Spacer
+  rowMargin?: Spacer
+  rowColor?: Color
+  rowOpacity?: number
   breakpoints?: Record<number, BreakpointConfig>
   color?: Color
   opacity?: Opacity
