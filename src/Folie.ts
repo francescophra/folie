@@ -13,6 +13,8 @@ const DEFAULTS = {
   margin: '20px',
   color: '#ff0000',
   opacity: 0.1,
+  rowColor: '#ff0000',
+  rowOpacity: 0.1,
   zIndex: 2147483647,
   shortcut: 'ctrl+g',
   showOnStart: true,
@@ -25,6 +27,8 @@ interface ResolvedOptions {
   breakpoints: Record<number, BreakpointConfig>
   color: string
   opacity: number
+  rowColor: string
+  rowOpacity: number
   zIndex: number
   shortcut: string
   showOnStart: boolean
@@ -35,6 +39,7 @@ interface ResolvedOptions {
 class Folie {
   private options: ResolvedOptions
   private wrapper: HTMLElement | null = null
+  private rowWrapper: HTMLElement | null = null
   private styleEl: HTMLStyleElement | null = null
   private toggleBtn: HTMLButtonElement | null = null
   private visible = false
@@ -43,7 +48,7 @@ class Folie {
   private ac: AbortController | null = null
 
   constructor(opts: FolieOptions = {}) {
-    const {columns, gutter, margin, breakpoints, ...rest} = opts
+    const {columns, gutter, margin, rows, rowsGutter, rowsMargin, rowColor, rowOpacity, breakpoints, ...rest} = opts
 
     const hasShorthand = columns !== undefined || gutter !== undefined || margin !== undefined
     const hasBreakpoints = breakpoints !== undefined && Object.keys(breakpoints).length > 0
@@ -79,9 +84,20 @@ class Folie {
       resolvedBreakpoints = breakpoints!
     }
 
+    if (rows !== undefined) resolvedBase.rows = rows
+    if (rowsGutter !== undefined) resolvedBase.rowsGutter = rowsGutter
+    if (rowsMargin !== undefined) resolvedBase.rowsMargin = rowsMargin
+
     const mode = rest.mode ?? 'fill'
     const opacity = rest.opacity ?? (mode === 'outline' ? 0.5 : DEFAULTS.opacity)
-    this.options = {...DEFAULTS, ...rest, base: resolvedBase, breakpoints: resolvedBreakpoints, mode, opacity}
+    this.options = {
+      ...DEFAULTS, ...rest,
+      base: resolvedBase,
+      breakpoints: resolvedBreakpoints,
+      mode, opacity,
+      rowColor: rowColor ?? DEFAULTS.rowColor,
+      rowOpacity: rowOpacity ?? DEFAULTS.rowOpacity,
+    }
     this.shortcut = this.parseShortcut(this.options.shortcut)
   }
 
@@ -101,9 +117,11 @@ class Folie {
     this.ac = null
     this.mql = []
     this.wrapper?.remove()
+    this.rowWrapper?.remove()
     this.styleEl?.remove()
     this.toggleBtn?.remove()
     this.wrapper = null
+    this.rowWrapper = null
     this.styleEl = null
     this.toggleBtn = null
     this.visible = false
@@ -116,6 +134,7 @@ class Folie {
       this.wrapper.style.display = ''
       this.visible = true
     }
+    if (this.rowWrapper) this.rowWrapper.style.display = ''
   }
 
   private hide(): void {
@@ -123,6 +142,7 @@ class Folie {
       this.wrapper.style.display = 'none'
       this.visible = false
     }
+    if (this.rowWrapper) this.rowWrapper.style.display = 'none'
   }
 
   private toggle(): void {
@@ -136,6 +156,14 @@ class Folie {
     this.wrapper.style.zIndex = String(this.options.zIndex)
     if (this.options.mode === 'outline') this.wrapper.dataset.flMode = 'outline'
     container.appendChild(this.wrapper)
+
+    if (this.options.base.rows !== undefined) {
+      this.rowWrapper = document.createElement('div')
+      this.rowWrapper.className = 'fl-row-wrapper'
+      this.rowWrapper.setAttribute('aria-hidden', 'true')
+      this.rowWrapper.style.zIndex = String(this.options.zIndex)
+      container.appendChild(this.rowWrapper)
+    }
   }
 
   private injectStyles(): void {
@@ -154,6 +182,20 @@ class Folie {
       '  height: 100%;',
       '  background: var(--fl-color);',
       '  opacity: var(--fl-opacity);',
+      '}',
+      '.fl-row-wrapper {',
+      '  position: fixed;',
+      '  inset: 0;',
+      '  pointer-events: none;',
+      '  display: grid;',
+      '  grid-template-rows: repeat(var(--fl-rows), 1fr);',
+      '  gap: var(--fl-row-gutter);',
+      '  padding: var(--fl-row-margin) 0;',
+      '}',
+      '.fl-row {',
+      '  width: 100%;',
+      '  background: var(--fl-row-color);',
+      '  opacity: var(--fl-row-opacity);',
       '}',
       '.fl-toggle {',
       '  position: fixed;',
@@ -232,19 +274,39 @@ class Folie {
     if (!this.wrapper) return
     const s = this.wrapper.style
     s.setProperty('--fl-columns', String(cfg.columns))
-    s.setProperty('--fl-gutter', cfg.gutter)
-    s.setProperty('--fl-margin', cfg.margin)
+    s.setProperty('--fl-gutter', cfg.gutter as string)
+    s.setProperty('--fl-margin', cfg.margin as string)
     s.setProperty('--fl-color', this.options.color)
     s.setProperty('--fl-opacity', String(this.options.opacity))
 
-    if (this.wrapper.childElementCount === cfg.columns) return
-    const frag = document.createDocumentFragment()
-    for (let i = 0; i < cfg.columns; i++) {
-      const col = document.createElement('div')
-      col.className = 'fl-col'
-      frag.appendChild(col)
+    if (this.wrapper.childElementCount !== cfg.columns) {
+      const frag = document.createDocumentFragment()
+      for (let i = 0; i < cfg.columns!; i++) {
+        const col = document.createElement('div')
+        col.className = 'fl-col'
+        frag.appendChild(col)
+      }
+      this.wrapper.replaceChildren(frag)
     }
-    this.wrapper.replaceChildren(frag)
+
+    if (this.rowWrapper && cfg.rows !== undefined) {
+      const rs = this.rowWrapper.style
+      rs.setProperty('--fl-rows', String(cfg.rows))
+      rs.setProperty('--fl-row-gutter', cfg.rowsGutter as string)
+      rs.setProperty('--fl-row-margin', cfg.rowsMargin as string)
+      rs.setProperty('--fl-row-color', this.options.rowColor)
+      rs.setProperty('--fl-row-opacity', String(this.options.rowOpacity))
+
+      if (this.rowWrapper.childElementCount !== cfg.rows) {
+        const frag = document.createDocumentFragment()
+        for (let i = 0; i < cfg.rows; i++) {
+          const row = document.createElement('div')
+          row.className = 'fl-row'
+          frag.appendChild(row)
+        }
+        this.rowWrapper.replaceChildren(frag)
+      }
+    }
   }
 
   private handleKeydown(e: KeyboardEvent): void {
