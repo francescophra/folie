@@ -168,6 +168,15 @@
         </button>
       </div>
 
+      <div class="modes">
+        <button class="active" data-rows="off">
+          <span class="btn-name">No rows</span>
+        </button>
+        <button data-rows="on">
+          <span class="btn-name">Rows</span>
+        </button>
+      </div>
+
       <footer>
         <span>©2026</span>
         <span>•</span>
@@ -182,6 +191,7 @@
       let instance;
       let currentCols = 6;
       let currentMode = "fill";
+      let currentRows = false;
 
       // Keep span/cols = 1/6 at all breakpoints so card width stays constant.
       // desktop: cols/6 — tablet: cols/3 — mobile: cols*2/3
@@ -198,7 +208,11 @@
       function build(cols, gutter) {
         currentCols = +cols;
         instance?.destroy();
-        instance = new Folie({columns: currentCols, gutter, margin: "20px", toggleButton: true, mode: currentMode, color: "#0051FF"}).mount();
+        instance = new Folie({
+          columns: currentCols, gutter, margin: "20px",
+          toggleButton: true, mode: currentMode, color: "#0051FF",
+          ...(currentRows && {rows: 6, rowsGutter: "20px", rowsMargin: "20px", rowColor: "#0051FF", rowOpacity: 0.05}),
+        }).mount();
         root.setProperty("--fl-columns", cols);
         root.setProperty("--fl-gutter", gutter);
         updateSpan();
@@ -216,11 +230,21 @@
         });
       });
 
-      document.querySelectorAll(".modes button").forEach((btn) => {
+      document.querySelectorAll("[data-mode]").forEach((btn) => {
         btn.addEventListener("click", () => {
-          document.querySelectorAll(".modes button").forEach((b) => b.classList.remove("active"));
+          document.querySelectorAll("[data-mode]").forEach((b) => b.classList.remove("active"));
           btn.classList.add("active");
           currentMode = btn.dataset.mode;
+          const activePreset = document.querySelector(".presets button.active");
+          build(activePreset.dataset.cols, activePreset.dataset.gutter);
+        });
+      });
+
+      document.querySelectorAll("[data-rows]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          document.querySelectorAll("[data-rows]").forEach((b) => b.classList.remove("active"));
+          btn.classList.add("active");
+          currentRows = btn.dataset.rows === "on";
           const activePreset = document.querySelector(".presets button.active");
           build(activePreset.dataset.cols, activePreset.dataset.gutter);
         });

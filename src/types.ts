@@ -15,7 +15,7 @@ export interface FolieOptions {
   rowsGutter?: Spacer
   rowsMargin?: Spacer
   rowColor?: Color
-  rowOpacity?: number
+  rowOpacity?: Opacity
   breakpoints?: Record<number, BreakpointConfig>
   color?: Color
   opacity?: Opacity

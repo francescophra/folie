@@ -43,19 +43,43 @@ new Folie({
 
 ### Per-breakpoint config
 
-Use numeric min-width keys. Top-level `columns`/`gutter`/`margin` becomes the base (0px+) config and can be combined with `breakpoints`.
+Use numeric min-width keys. Top-level `columns`/`gutter`/`margin` becomes the base (0px+) config and can be combined with `breakpoints`. All fields are optional — unspecified fields inherit from the base.
 
 ```js
 new Folie({
   columns: 6, gutter: "10px", margin: "20px", // base: 0px+
   breakpoints: {
-    768:  {columns: 8,  gutter: "10px", margin: "15px"},
+    768:  {columns: 8},                              // gutter/margin inherited
     1024: {columns: 12, gutter: "20px", margin: "20px"},
   },
 }).mount();
 ```
 
 If `breakpoints` is provided without shorthand, DEFAULTS (`columns: 12, gutter: 20px, margin: 20px`) are used as the base config.
+
+### Row overlay
+
+Add a horizontal row overlay alongside the column grid:
+
+```js
+new Folie({
+  columns: 12, gutter: "20px", margin: "20px",
+  rows: 8, rowsGutter: "20px", rowsMargin: "20px",
+  rowColor: "#0000ff", rowOpacity: 0.05,
+}).mount();
+```
+
+Row count can also be overridden per breakpoint:
+
+```js
+new Folie({
+  columns: 6, gutter: "20px", margin: "20px",
+  rows: 6, rowsGutter: "20px", rowsMargin: "20px",
+  breakpoints: {
+    1024: {columns: 12, rows: 10},
+  },
+}).mount();
+```
 
 ## Options
 
@@ -67,6 +91,11 @@ If `breakpoints` is provided without shorthand, DEFAULTS (`columns: 12, gutter: 
 | `breakpoints`  | `object`  | —            | Per-breakpoint config keyed by numeric min-width (px). Can be combined with shorthand. |
 | `showOnStart`  | `boolean` | `true`       | Whether the grid is visible immediately on `mount()`                              |
 | `toggleButton` | `boolean` | `false`      | When `true`, mounts a 40×40 button fixed to the bottom-left that toggles the grid |
+| `rows`         | `number`  | —            | Number of rows. If omitted, no row overlay is rendered.                           |
+| `rowsGutter`   | `Spacer`  | —            | Vertical gap between rows.                                                        |
+| `rowsMargin`   | `Spacer`  | —            | Top/bottom padding of the row overlay.                                            |
+| `rowColor`     | `Color`   | `#ff0000`    | Row background color (global, not per-breakpoint)                                 |
+| `rowOpacity`   | `number`  | `0.1`        | Row opacity (global, not per-breakpoint)                                          |
 | `color`        | `Color`   | `#ff0000`    | Column background color                                                           |
 | `opacity`      | `number`  | `0.1`        | Column opacity                                                                    |
 | `zIndex`       | `number`  | `2147483647` | z-index of the overlay                                                            |
@@ -93,11 +122,14 @@ Any CSS color value accepted by `background` / `box-shadow`:
 
 Keys are numeric min-widths in px. Ranges are inferred from adjacent keys. `columns`, `gutter`, and `margin` match the Layout Grid fields in Figma's design panel.
 
-| Key       | Type     | Required | Description                                                             |
-| --------- | -------- | -------- | ----------------------------------------------------------------------- |
-| `columns` | `number` | yes      | Number of columns                                                       |
-| `gutter`  | `Spacer` | yes      | Gap between columns — any CSS value, including `var(--*)` and `clamp()` |
-| `margin`  | `Spacer` | yes      | Left/right padding of the grid — any CSS value, including `var(--*)` and `clamp()` |
+| Key           | Type     | Required | Description                                                             |
+| ------------- | -------- | -------- | ----------------------------------------------------------------------- |
+| `columns`     | `number` | no       | Number of columns — inherits from base if omitted                       |
+| `gutter`      | `Spacer` | no       | Gap between columns — inherits from base if omitted                     |
+| `margin`      | `Spacer` | no       | Left/right padding — inherits from base if omitted                      |
+| `rows`        | `number` | no       | Number of rows — inherits from base if omitted                          |
+| `rowsGutter`  | `Spacer` | no       | Vertical gap between rows — inherits from base if omitted               |
+| `rowsMargin`  | `Spacer` | no       | Top/bottom padding of the row overlay — inherits from base if omitted   |
 
 ### Default base config
 
@@ -111,13 +143,18 @@ When no shorthand is provided, the following is used as the base (0px+):
 
 The overlay is driven by CSS custom properties set on `.fl-wrapper`. You can override them in your own CSS if needed.
 
-| Property       | Description         |
-| -------------- | ------------------- |
-| `--fl-columns` | Number of columns   |
-| `--fl-gutter`  | Gap between columns |
-| `--fl-margin`  | Left/right padding  |
-| `--fl-color`   | Column color        |
-| `--fl-opacity` | Column opacity      |
+| Property            | Description              |
+| ------------------- | ------------------------ |
+| `--fl-columns`      | Number of columns        |
+| `--fl-gutter`       | Gap between columns      |
+| `--fl-margin`       | Left/right padding       |
+| `--fl-color`        | Column color             |
+| `--fl-opacity`      | Column opacity           |
+| `--fl-rows`         | Number of rows           |
+| `--fl-row-gutter`   | Vertical gap between rows |
+| `--fl-row-margin`   | Top/bottom padding       |
+| `--fl-row-color`    | Row color                |
+| `--fl-row-opacity`  | Row opacity              |
 
 ## API
 
