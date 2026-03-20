@@ -63,16 +63,32 @@ new Folie({
 | Option         | Type      | Default      | Description                                                                       |
 | -------------- | --------- | ------------ | --------------------------------------------------------------------------------- |
 | `columns`      | `number`  | —            | Column count for all breakpoints (ignored when `breakpoints` is set)              |
-| `gutter`       | `string`  | —            | Gutter for all breakpoints (ignored when `breakpoints` is set)                    |
-| `margin`       | `string`  | —            | Margin for all breakpoints (ignored when `breakpoints` is set)                    |
+| `gutter`       | `Spacer`  | —            | Gutter for all breakpoints (ignored when `breakpoints` is set)                    |
+| `margin`       | `Spacer`  | —            | Margin for all breakpoints (ignored when `breakpoints` is set)                    |
 | `breakpoints`  | `object`  | see below    | Per-breakpoint config — overrides `columns`/`gutter`/`margin`                     |
 | `showOnStart`  | `boolean` | `true`       | Whether the grid is visible immediately on `mount()`                              |
 | `toggleButton` | `boolean` | `false`      | When `true`, mounts a 40×40 button fixed to the bottom-left that toggles the grid |
-| `color`        | `string`  | `#ff0000`    | Column background color                                                           |
+| `color`        | `Color`   | `#ff0000`    | Column background color                                                           |
 | `opacity`      | `number`  | `0.1`        | Column opacity                                                                    |
 | `zIndex`       | `number`  | `2147483647` | z-index of the overlay                                                            |
 | `shortcut`     | `string`  | `ctrl+g`     | Keyboard shortcut to toggle visibility                                            |
 | `mode`         | `'fill' \| 'outline'` | `'fill'` | `'outline'` renders columns as inset box-shadow borders instead of filled rectangles. When `mode` is `'outline'` and `opacity` is not set, opacity defaults to `0.5` |
+
+### Spacer
+
+Any CSS length value, a CSS custom property, or a `var()` reference:
+
+```
+20px · 1.5rem · 2vw · clamp(10px, 2vw, 24px) · var(--my-gutter) · --my-token
+```
+
+### Color
+
+Any CSS color value accepted by `background` / `box-shadow`:
+
+```
+#ff0000 · rgb(255,0,0) · rgba(255,0,0,0.5) · hsl(0,100%,50%) · transparent · currentColor · var(--brand)
+```
 
 ## Breakpoint config
 
@@ -81,8 +97,8 @@ new Folie({
 | Key       | Type     | Required | Description                                                                                           |
 | --------- | -------- | -------- | ----------------------------------------------------------------------------------------------------- |
 | `columns` | `number` | yes      | Number of columns                                                                                     |
-| `gutter`  | `string` | yes      | Gap between columns — any CSS value, including `var(--*)` and `clamp()`                               |
-| `margin`  | `string` | yes      | Left/right padding of the grid — any CSS value, including `var(--*)` and `clamp()`                    |
+| `gutter`  | `Spacer` | yes      | Gap between columns — any CSS value, including `var(--*)` and `clamp()`                               |
+| `margin`  | `Spacer` | yes      | Left/right padding of the grid — any CSS value, including `var(--*)` and `clamp()`                    |
 | `until`   | `number` | no       | Upper bound in px (must be a plain number). Omit on the largest breakpoint — it becomes the catch-all |
 
 ### Built-in defaults

@@ -66,6 +66,49 @@ describe('columns', () => {
   })
 })
 
+// --- Spacer values (gutter / margin) ---
+
+describe('Spacer values', () => {
+  const cases = [
+    ['px',  '20px'],
+    ['rem', '1.5rem'],
+    ['vw',  '2vw'],
+    ['var()', 'var(--my-gutter)'],
+  ]
+
+  for (const [label, value] of cases) {
+    it(`accepts ${label} as gutter`, () => {
+      folie = new Folie({columns: 4, gutter: value, margin: '20px'}).mount()
+      expect(document.querySelector('.fl-wrapper').style.getPropertyValue('--fl-gutter')).toBe(value)
+    })
+
+    it(`accepts ${label} as margin`, () => {
+      folie = new Folie({columns: 4, gutter: '20px', margin: value}).mount()
+      expect(document.querySelector('.fl-wrapper').style.getPropertyValue('--fl-margin')).toBe(value)
+    })
+  }
+})
+
+// --- Color values ---
+
+describe('Color values', () => {
+  const cases = [
+    ['hex',         '#00ff00'],
+    ['rgb()',       'rgb(0,255,0)'],
+    ['rgba()',      'rgba(0,255,0,0.5)'],
+    ['hsl()',       'hsl(120,100%,50%)'],
+    ['transparent', 'transparent'],
+    ['var()',       'var(--brand)'],
+  ]
+
+  for (const [label, value] of cases) {
+    it(`accepts ${label} as color`, () => {
+      folie = new Folie({columns: 4, color: value}).mount()
+      expect(document.querySelector('.fl-wrapper').style.getPropertyValue('--fl-color')).toBe(value)
+    })
+  }
+})
+
 // --- CSS custom properties ---
 
 describe('CSS custom properties', () => {
