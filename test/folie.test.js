@@ -201,6 +201,16 @@ describe('breakpoints', () => {
     expect(wrapper.style.getPropertyValue('--fl-columns')).toBe('8')
   })
 
+  it('partial breakpoint inherits gutter and margin from base', () => {
+    folie = new Folie({
+      columns: 6, gutter: '10px', margin: '20px',
+      breakpoints: {1024: {columns: 12}},
+    }).mount()
+    const wrapper = document.querySelector('.fl-wrapper')
+    expect(wrapper.style.getPropertyValue('--fl-gutter')).toBe('10px')
+    expect(wrapper.style.getPropertyValue('--fl-margin')).toBe('20px')
+  })
+
   it('_buildRangeQueries — bounded ranges for all but last, open-ended for last', () => {
     const f = new Folie({
       columns: 4,

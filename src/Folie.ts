@@ -192,7 +192,7 @@ class Folie {
     const {base, breakpoints} = this.options
     const entries = [
       {minPx: 0, cfg: base},
-      ...Object.entries(breakpoints).map(([k, cfg]) => ({minPx: Number(k), cfg})),
+      ...Object.entries(breakpoints).map(([k, cfg]) => ({minPx: Number(k), cfg: {...base, ...cfg}})),
     ].sort((a, b) => a.minPx - b.minPx)
 
     return entries.map((entry, i) => {
