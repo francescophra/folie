@@ -181,6 +181,41 @@ describe('visibility', () => {
   })
 })
 
+// --- Breakpoints (numeric key API) ---
+
+describe('breakpoints', () => {
+  it('combined shorthand + breakpoints — highest breakpoint applied in jsdom (matchMedia always false)', () => {
+    folie = new Folie({
+      columns: 4, gutter: '10px', margin: '20px',
+      breakpoints: {1024: {columns: 8, gutter: '20px', margin: '30px'}},
+    }).mount()
+    const wrapper = document.querySelector('.fl-wrapper')
+    expect(wrapper.style.getPropertyValue('--fl-columns')).toBe('8')
+  })
+
+  it('breakpoints only — DEFAULTS used as base; highest breakpoint applied in jsdom', () => {
+    folie = new Folie({
+      breakpoints: {1024: {columns: 8, gutter: '20px', margin: '30px'}},
+    }).mount()
+    const wrapper = document.querySelector('.fl-wrapper')
+    expect(wrapper.style.getPropertyValue('--fl-columns')).toBe('8')
+  })
+
+  it('_buildRangeQueries — bounded ranges for all but last, open-ended for last', () => {
+    const f = new Folie({
+      columns: 4,
+      breakpoints: {
+        768: {columns: 8, gutter: '20px', margin: '15px'},
+        1024: {columns: 12, gutter: '30px', margin: '20px'},
+      },
+    })
+    const ranges = f._buildRangeQueries()
+    expect(ranges[0].query).toBe('(min-width: 0px) and (max-width: 767px)')
+    expect(ranges[1].query).toBe('(min-width: 768px) and (max-width: 1023px)')
+    expect(ranges[2].query).toBe('(min-width: 1024px)')
+  })
+})
+
 // --- Toggle button ---
 
 describe('toggleButton', () => {

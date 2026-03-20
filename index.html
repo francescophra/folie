@@ -13,7 +13,7 @@
 
       :root {
         --fl-columns: 12;
-        --fl-gutter: 20px;
+        --fl-gutter: 10px;
         --fl-margin: 20px;
         --fl-span: 2;
       }
@@ -44,7 +44,8 @@
         width: calc(var(--fl-span) * (100vw - 2 * var(--fl-margin) - (var(--fl-columns) - 1) * var(--fl-gutter)) / var(--fl-columns) + (var(--fl-span) - 1) * var(--fl-gutter));
         background: #fff;
         /* border-radius: 10px; */
-        padding: 1vw;
+        padding: 10px;
+        transition: 0.2s ease-out;
       }
 
       .title {
@@ -144,17 +145,17 @@
       <p class="title">— ctrl+g to toggle</p>
 
       <div class="presets">
-        <button class="active" data-cols="6" data-gutter="20px" data-span="1">
+        <button class="active" data-cols="6" data-gutter="10px" data-span="1">
           <span class="btn-name">6 col</span>
           <span class="btn-meta">20px / 20px</span>
         </button>
-        <button data-cols="12" data-gutter="20px" data-span="2">
+        <button data-cols="12" data-gutter="10px" data-span="2">
           <span class="btn-name">12 col</span>
           <span class="btn-meta">20px / 20px</span>
         </button>
-        <button data-cols="24" data-gutter="1vw" data-span="4">
+        <button data-cols="24" data-gutter="10px" data-span="4">
           <span class="btn-name">24 col</span>
-          <span class="btn-meta">20px / 1vw</span>
+          <span class="btn-meta">20px / 10px</span>
         </button>
       </div>
 
@@ -203,7 +204,7 @@
         updateSpan();
       }
 
-      build("6", "20px");
+      build("6", "10px");
 
       window.addEventListener("resize", updateSpan);
 

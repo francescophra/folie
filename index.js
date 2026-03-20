@@ -1,9 +1,7 @@
 const DEFAULTS = {
-  breakpoints: {
-    mobile: {columns: 6, gutter: "10px", margin: "20px", until: 767},
-    tablet: {columns: 8, gutter: "10px", margin: "15px", until: 1023},
-    desktop: {columns: 12, gutter: "20px", margin: "20px"},
-  },
+  columns: 12,
+  gutter: "20px",
+  margin: "20px",
   color: "#ff0000",
   opacity: 0.1,
   zIndex: 2147483647,
@@ -17,24 +15,42 @@ class Folie {
   constructor(options = {}) {
     const {columns, gutter, margin, breakpoints, ...rest} = options;
 
-    let resolvedBreakpoints;
-    if (breakpoints) {
-      resolvedBreakpoints = breakpoints;
-    } else if (columns !== undefined || gutter !== undefined || margin !== undefined) {
-      resolvedBreakpoints = {
-        base: {
-          columns: columns ?? 12,
-          gutter: gutter ?? "20px",
-          margin: margin ?? "20px",
-        },
+    const hasShorthand = columns !== undefined || gutter !== undefined || margin !== undefined;
+    const hasBreakpoints = breakpoints !== undefined && Object.keys(breakpoints).length > 0;
+
+    const defaultBase = {
+      columns: DEFAULTS.columns,
+      gutter: DEFAULTS.gutter,
+      margin: DEFAULTS.margin,
+    };
+
+    let resolvedBase, resolvedBreakpoints;
+
+    if (!hasShorthand && !hasBreakpoints) {
+      resolvedBase = defaultBase;
+      resolvedBreakpoints = {};
+    } else if (hasShorthand && !hasBreakpoints) {
+      resolvedBase = {
+        columns: columns ?? DEFAULTS.columns,
+        gutter: gutter ?? DEFAULTS.gutter,
+        margin: margin ?? DEFAULTS.margin,
       };
+      resolvedBreakpoints = {};
+    } else if (!hasShorthand && hasBreakpoints) {
+      resolvedBase = defaultBase;
+      resolvedBreakpoints = breakpoints;
     } else {
-      resolvedBreakpoints = DEFAULTS.breakpoints;
+      resolvedBase = {
+        columns: columns ?? DEFAULTS.columns,
+        gutter: gutter ?? DEFAULTS.gutter,
+        margin: margin ?? DEFAULTS.margin,
+      };
+      resolvedBreakpoints = breakpoints;
     }
 
     const mode = rest.mode ?? 'fill';
     const opacity = rest.opacity ?? (mode === 'outline' ? 0.5 : DEFAULTS.opacity);
-    this._options = {...DEFAULTS, ...rest, breakpoints: resolvedBreakpoints, mode, opacity};
+    this._options = {...DEFAULTS, ...rest, base: resolvedBase, breakpoints: resolvedBreakpoints, mode, opacity};
     this._shortcut = this._parseShortcut(this._options.shortcut);
     this._wrapper = null;
     this._styleEl = null;
@@ -116,26 +132,19 @@ class Folie {
   }
 
   _buildRangeQueries() {
-    const values = Object.values(this._options.breakpoints);
-    const bounded = values.filter((cfg) => cfg.until !== undefined).sort((a, b) => a.until - b.until);
-    const catchAll = values.find((cfg) => cfg.until === undefined);
+    const {base, breakpoints} = this._options;
+    const entries = [
+      {minPx: 0, cfg: base},
+      ...Object.entries(breakpoints).map(([k, cfg]) => ({minPx: Number(k), cfg})),
+    ].sort((a, b) => a.minPx - b.minPx);
 
-    const ranges = [];
-
-    for (let i = 0; i < bounded.length; i++) {
-      const cfg = bounded[i];
-      const minPx = i === 0 ? 0 : bounded[i - 1].until + 1;
-      const query = `(min-width: ${minPx}px) and (max-width: ${cfg.until}px)`;
-      ranges.push({query, cfg});
-    }
-
-    if (catchAll) {
-      const last = bounded[bounded.length - 1];
-      const query = last ? `(min-width: ${last.until + 1}px)` : "(min-width: 0px)";
-      ranges.push({query, cfg: catchAll});
-    }
-
-    return ranges;
+    return entries.map((entry, i) => {
+      const next = entries[i + 1];
+      const query = next
+        ? `(min-width: ${entry.minPx}px) and (max-width: ${next.minPx - 1}px)`
+        : `(min-width: ${entry.minPx}px)`;
+      return {query, cfg: entry.cfg};
+    });
   }
 
   _setupMediaQueries() {

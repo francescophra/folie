@@ -43,29 +43,28 @@ new Folie({
 
 ### Per-breakpoint config
 
-When `breakpoints` is provided it takes full precedence over any top-level `columns`/`gutter`/`margin`.
+Use numeric min-width keys. Top-level `columns`/`gutter`/`margin` becomes the base (0px+) config and can be combined with `breakpoints`.
 
 ```js
 new Folie({
-  showOnStart: false, // hidden on mount, toggle with Ctrl+G
-  color: "#ff0000",
-  opacity: 0.08,
+  columns: 6, gutter: "10px", margin: "20px", // base: 0px+
   breakpoints: {
-    mobile: {columns: 6, gutter: "10px", margin: "20px", until: 767},
-    tablet: {columns: 8, gutter: "10px", margin: "15px", until: 1023},
-    desktop: {columns: 12, gutter: "20px", margin: "20px"},
+    768:  {columns: 8,  gutter: "10px", margin: "15px"},
+    1024: {columns: 12, gutter: "20px", margin: "20px"},
   },
 }).mount();
 ```
+
+If `breakpoints` is provided without shorthand, DEFAULTS (`columns: 12, gutter: 20px, margin: 20px`) are used as the base config.
 
 ## Options
 
 | Option         | Type      | Default      | Description                                                                       |
 | -------------- | --------- | ------------ | --------------------------------------------------------------------------------- |
-| `columns`      | `number`  | —            | Column count for all breakpoints (ignored when `breakpoints` is set)              |
-| `gutter`       | `Spacer`  | —            | Gutter for all breakpoints (ignored when `breakpoints` is set)                    |
-| `margin`       | `Spacer`  | —            | Margin for all breakpoints (ignored when `breakpoints` is set)                    |
-| `breakpoints`  | `object`  | see below    | Per-breakpoint config — overrides `columns`/`gutter`/`margin`                     |
+| `columns`      | `number`  | `12`         | Column count at 0px+ (base). Acts as the catch-all when no `breakpoints` are set. |
+| `gutter`       | `Spacer`  | `20px`       | Gutter at 0px+ (base).                                                            |
+| `margin`       | `Spacer`  | `20px`       | Margin at 0px+ (base).                                                            |
+| `breakpoints`  | `object`  | —            | Per-breakpoint config keyed by numeric min-width (px). Can be combined with shorthand. |
 | `showOnStart`  | `boolean` | `true`       | Whether the grid is visible immediately on `mount()`                              |
 | `toggleButton` | `boolean` | `false`      | When `true`, mounts a 40×40 button fixed to the bottom-left that toggles the grid |
 | `color`        | `Color`   | `#ff0000`    | Column background color                                                           |
@@ -92,22 +91,21 @@ Any CSS color value accepted by `background` / `box-shadow`:
 
 ## Breakpoint config
 
-`columns`, `gutter`, and `margin` match the Layout Grid fields in Figma's design panel — copy the values directly.
+Keys are numeric min-widths in px. Ranges are inferred from adjacent keys. `columns`, `gutter`, and `margin` match the Layout Grid fields in Figma's design panel.
 
-| Key       | Type     | Required | Description                                                                                           |
-| --------- | -------- | -------- | ----------------------------------------------------------------------------------------------------- |
-| `columns` | `number` | yes      | Number of columns                                                                                     |
-| `gutter`  | `Spacer` | yes      | Gap between columns — any CSS value, including `var(--*)` and `clamp()`                               |
-| `margin`  | `Spacer` | yes      | Left/right padding of the grid — any CSS value, including `var(--*)` and `clamp()`                    |
-| `until`   | `number` | no       | Upper bound in px (must be a plain number). Omit on the largest breakpoint — it becomes the catch-all |
+| Key       | Type     | Required | Description                                                             |
+| --------- | -------- | -------- | ----------------------------------------------------------------------- |
+| `columns` | `number` | yes      | Number of columns                                                       |
+| `gutter`  | `Spacer` | yes      | Gap between columns — any CSS value, including `var(--*)` and `clamp()` |
+| `margin`  | `Spacer` | yes      | Left/right padding of the grid — any CSS value, including `var(--*)` and `clamp()` |
 
-### Built-in defaults
+### Default base config
 
-| Breakpoint | Columns | Gutter | Margin | until  |
-| ---------- | ------- | ------ | ------ | ------ |
-| mobile     | 6       | 10px   | 20px   | 767px  |
-| tablet     | 8       | 10px   | 15px   | 1023px |
-| desktop    | 12      | 20px   | 20px   | —      |
+When no shorthand is provided, the following is used as the base (0px+):
+
+| columns | gutter | margin |
+| ------- | ------ | ------ |
+| 12      | 20px   | 20px   |
 
 ## CSS custom properties
 
