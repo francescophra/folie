@@ -10,15 +10,15 @@ export interface BreakpointConfig {
 export interface FolieOptions {
   columns?: number
   gutter?: Spacer
-  margin?:  Spacer
+  margin?: Spacer
   rows?: number
   rowsGutter?: Spacer
   rowsMargin?: Spacer
   rowsColor?: Color
-  rowsOpacity?: Opacity
+  rowsOpacity?: number
   breakpoints?: Record<number, BreakpointConfig>
   color?: Color
-  opacity?: Opacity
+  opacity?: number
   zIndex?: number
   shortcut?: string
   showOnStart?: boolean
@@ -26,7 +26,7 @@ export interface FolieOptions {
   mode?: 'fill' | 'outline'
 }
 
-type Spacer = CSSUnit | CustomProperty | Var
+type Spacer = CSSUnit | CustomProperty | Var | (string & {})
 
 type CSSUnit =
   | `${number}px` | `${number}pt` | `${number}pc`
@@ -38,8 +38,6 @@ type CSSUnit =
   | `${number}dvw` | `${number}dvh`
   | `${number}fr`
   | '0'
-
-type Opacity = '0.1' | '0.2' | '0.3' | '0.4' | '0.5' | '0.6' | '0.7' | '0.8' | '0.9' | '1.0'
 
 type RGB = `rgb(${string})`
 type RGBA = `rgba(${string})`
