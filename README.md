@@ -20,6 +20,8 @@ yarn add folie-grid
 
 ## Usage
 
+The package ships TypeScript declarations. No `@types/` package needed.
+
 ### Minimal — built-in defaults
 
 ```js
@@ -79,6 +81,29 @@ new Folie({
     1024: {columns: 12, rows: 10},
   },
 }).mount();
+```
+
+### TypeScript
+
+```ts
+import Folie, { type FolieOptions, type BreakpointConfig, type Color } from "folie-grid";
+
+const config: FolieOptions = {
+  columns: 12,
+  gutter: "20px",
+  margin: "clamp(16px, 5vw, 80px)",
+  breakpoints: {
+    768:  { columns: 8 } satisfies BreakpointConfig,
+    1280: { columns: 12, gutter: "30px" },
+  },
+};
+
+const grid = new Folie(config).mount();
+
+// destroy on HMR teardown
+if (import.meta.hot) {
+  import.meta.hot.dispose(() => grid.destroy());
+}
 ```
 
 ## Options
