@@ -239,19 +239,19 @@ describe('rows', () => {
     expect(document.querySelectorAll('.fl-row').length).toBe(4)
   })
 
-  it('sets --fl-rows, --fl-row-gutter, --fl-row-margin correctly', () => {
+  it('sets --fl-rows, --fl-rows-gutter, --fl-rows-margin correctly', () => {
     folie = new Folie({columns: 4, rows: 6, rowsGutter: '16px', rowsMargin: '24px'}).mount()
     const rw = document.querySelector('.fl-row-wrapper')
     expect(rw.style.getPropertyValue('--fl-rows')).toBe('6')
-    expect(rw.style.getPropertyValue('--fl-row-gutter')).toBe('16px')
-    expect(rw.style.getPropertyValue('--fl-row-margin')).toBe('24px')
+    expect(rw.style.getPropertyValue('--fl-rows-gutter')).toBe('16px')
+    expect(rw.style.getPropertyValue('--fl-rows-margin')).toBe('24px')
   })
 
-  it('sets --fl-row-color and --fl-row-opacity correctly', () => {
-    folie = new Folie({columns: 4, rows: 4, rowsGutter: '10px', rowsMargin: '10px', rowColor: '#0000ff', rowOpacity: 0.05}).mount()
+  it('sets --fl-rows-color and --fl-rows-opacity correctly', () => {
+    folie = new Folie({columns: 4, rows: 4, rowsGutter: '10px', rowsMargin: '10px', rowsColor: '#0000ff', rowsOpacity: 0.05}).mount()
     const rw = document.querySelector('.fl-row-wrapper')
-    expect(rw.style.getPropertyValue('--fl-row-color')).toBe('#0000ff')
-    expect(rw.style.getPropertyValue('--fl-row-opacity')).toBe('0.05')
+    expect(rw.style.getPropertyValue('--fl-rows-color')).toBe('#0000ff')
+    expect(rw.style.getPropertyValue('--fl-rows-opacity')).toBe('0.05')
   })
 
   it('partial breakpoint inherits rowsGutter and rowsMargin from base', () => {
@@ -260,8 +260,8 @@ describe('rows', () => {
       breakpoints: {1024: {rows: 10}},
     }).mount()
     const rw = document.querySelector('.fl-row-wrapper')
-    expect(rw.style.getPropertyValue('--fl-row-gutter')).toBe('10px')
-    expect(rw.style.getPropertyValue('--fl-row-margin')).toBe('20px')
+    expect(rw.style.getPropertyValue('--fl-rows-gutter')).toBe('10px')
+    expect(rw.style.getPropertyValue('--fl-rows-margin')).toBe('20px')
   })
 })
 

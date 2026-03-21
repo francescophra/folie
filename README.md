@@ -65,7 +65,7 @@ Add a horizontal row overlay alongside the column grid:
 new Folie({
   columns: 12, gutter: "20px", margin: "20px",
   rows: 8, rowsGutter: "20px", rowsMargin: "20px",
-  rowColor: "#0000ff", rowOpacity: 0.05,
+  rowsColor: "#0000ff", rowsOpacity: 0.05,
 }).mount();
 ```
 
@@ -94,8 +94,8 @@ new Folie({
 | `rows`         | `number`  | —            | Number of rows. If omitted, no row overlay is rendered.                           |
 | `rowsGutter`   | `Spacer`  | —            | Vertical gap between rows.                                                        |
 | `rowsMargin`   | `Spacer`  | —            | Top/bottom padding of the row overlay.                                            |
-| `rowColor`     | `Color`   | `#ff0000`    | Row background color (global, not per-breakpoint)                                 |
-| `rowOpacity`   | `number`  | `0.1`        | Row opacity (global, not per-breakpoint)                                          |
+| `rowsColor`    | `Color`   | `#ff0000`    | Row background color (global, not per-breakpoint)                                 |
+| `rowsOpacity`  | `number`  | `0.1`        | Row opacity (global, not per-breakpoint)                                          |
 | `color`        | `Color`   | `#ff0000`    | Column background color                                                           |
 | `opacity`      | `number`  | `0.1`        | Column opacity                                                                    |
 | `zIndex`       | `number`  | `2147483647` | z-index of the overlay                                                            |
@@ -151,10 +151,10 @@ The overlay is driven by CSS custom properties set on `.fl-wrapper`. You can ove
 | `--fl-color`        | Column color             |
 | `--fl-opacity`      | Column opacity           |
 | `--fl-rows`         | Number of rows           |
-| `--fl-row-gutter`   | Vertical gap between rows |
-| `--fl-row-margin`   | Top/bottom padding       |
-| `--fl-row-color`    | Row color                |
-| `--fl-row-opacity`  | Row opacity              |
+| `--fl-rows-gutter`   | Vertical gap between rows |
+| `--fl-rows-margin`   | Top/bottom padding       |
+| `--fl-rows-color`    | Row color                |
+| `--fl-rows-opacity`  | Row opacity              |
 
 ## API
 

@@ -208,7 +208,7 @@
         instance = new Folie({
           columns: currentCols, gutter, margin: "20px",
           toggleButton: true, mode: currentMode, color: "#0051FF",
-          ...(currentRows && {rows: 6, rowsGutter: gutter, rowsMargin: "20px", rowColor: "#0051FF", rowOpacity: 0.05}),
+          ...(currentRows && {rows: 6, rowsGutter: gutter, rowsMargin: "20px", rowsColor: "#0051FF", rowsOpacity: 0.05}),
         }).mount();
         root.setProperty("--fl-columns", cols);
         root.setProperty("--fl-gutter", gutter);

@@ -13,8 +13,8 @@ const DEFAULTS = {
   margin: '20px',
   color: '#ff0000',
   opacity: 0.1,
-  rowColor: '#ff0000',
-  rowOpacity: 0.1,
+  rowsColor: '#ff0000',
+  rowsOpacity: 0.1,
   zIndex: 2147483647,
   shortcut: 'ctrl+g',
   showOnStart: true,
@@ -27,8 +27,8 @@ interface ResolvedOptions {
   breakpoints: Record<number, BreakpointConfig>
   color: string
   opacity: number
-  rowColor: string
-  rowOpacity: number
+  rowsColor: string
+  rowsOpacity: number
   zIndex: number
   shortcut: string
   showOnStart: boolean
@@ -48,7 +48,7 @@ class Folie {
   private ac: AbortController | null = null
 
   constructor(opts: FolieOptions = {}) {
-    const {columns, gutter, margin, rows, rowsGutter, rowsMargin, rowColor, rowOpacity, breakpoints, ...rest} = opts
+    const {columns, gutter, margin, rows, rowsGutter, rowsMargin, rowsColor, rowsOpacity, breakpoints, ...rest} = opts
 
     const hasShorthand = columns !== undefined || gutter !== undefined || margin !== undefined
     const hasBreakpoints = breakpoints !== undefined && Object.keys(breakpoints).length > 0
@@ -95,8 +95,8 @@ class Folie {
       base: resolvedBase,
       breakpoints: resolvedBreakpoints,
       mode, opacity,
-      rowColor: rowColor ?? DEFAULTS.rowColor,
-      rowOpacity: rowOpacity ?? DEFAULTS.rowOpacity,
+      rowsColor: rowsColor ?? DEFAULTS.rowsColor,
+      rowsOpacity: rowsOpacity ?? DEFAULTS.rowsOpacity,
     }
     this.shortcut = this.parseShortcut(this.options.shortcut)
   }
@@ -189,13 +189,13 @@ class Folie {
       '  pointer-events: none;',
       '  display: grid;',
       '  grid-template-rows: repeat(var(--fl-rows), 1fr);',
-      '  gap: var(--fl-row-gutter);',
-      '  padding: var(--fl-row-margin) 0;',
+      '  gap: var(--fl-rows-gutter);',
+      '  padding: var(--fl-rows-margin) 0;',
       '}',
       '.fl-row {',
       '  width: 100%;',
-      '  background: var(--fl-row-color);',
-      '  opacity: var(--fl-row-opacity);',
+      '  background: var(--fl-rows-color);',
+      '  opacity: var(--fl-rows-opacity);',
       '}',
       '.fl-toggle {',
       '  position: fixed;',
@@ -292,10 +292,10 @@ class Folie {
     if (this.rowWrapper && cfg.rows !== undefined) {
       const rs = this.rowWrapper.style
       rs.setProperty('--fl-rows', String(cfg.rows))
-      rs.setProperty('--fl-row-gutter', cfg.rowsGutter as string)
-      rs.setProperty('--fl-row-margin', cfg.rowsMargin as string)
-      rs.setProperty('--fl-row-color', this.options.rowColor)
-      rs.setProperty('--fl-row-opacity', String(this.options.rowOpacity))
+      rs.setProperty('--fl-rows-gutter', cfg.rowsGutter as string)
+      rs.setProperty('--fl-rows-margin', cfg.rowsMargin as string)
+      rs.setProperty('--fl-rows-color', this.options.rowsColor)
+      rs.setProperty('--fl-rows-opacity', String(this.options.rowsOpacity))
 
       if (this.rowWrapper.childElementCount !== cfg.rows) {
         const frag = document.createDocumentFragment()

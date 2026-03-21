@@ -1,6 +1,6 @@
 {
   "name": "folie-grid",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Lightweight column grid overlay for the browser. Same columns, gutter, and margin as your Figma layout grid. Toggle it while you build.",
   "type": "module",
   "main": "./index.js",

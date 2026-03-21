@@ -8,15 +8,14 @@
   <body>
     <script type="module">
       import Folie from "./index.js";
-
       const folie = new Folie({
         columns: 6,
         gutter: "20px",
         margin: "20px",
         toggleButton: true,
         breakpoints: {
-          1920: {columns: 12},
           720: {columns: 20},
+          1920: {columns: 12},
         },
       }).mount();
     </script>

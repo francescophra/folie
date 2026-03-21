@@ -4,8 +4,8 @@ const DEFAULTS = {
   margin: "20px",
   color: "#ff0000",
   opacity: 0.1,
-  rowColor: "#ff0000",
-  rowOpacity: 0.1,
+  rowsColor: "#ff0000",
+  rowsOpacity: 0.1,
   zIndex: 2147483647,
   shortcut: "ctrl+g",
   showOnStart: true,
@@ -15,7 +15,7 @@ const DEFAULTS = {
 
 class Folie {
   constructor(options = {}) {
-    const {columns, gutter, margin, rows, rowsGutter, rowsMargin, rowColor, rowOpacity, breakpoints, ...rest} = options;
+    const {columns, gutter, margin, rows, rowsGutter, rowsMargin, rowsColor, rowsOpacity, breakpoints, ...rest} = options;
 
     const hasShorthand = columns !== undefined || gutter !== undefined || margin !== undefined;
     const hasBreakpoints = breakpoints !== undefined && Object.keys(breakpoints).length > 0;
@@ -61,8 +61,8 @@ class Folie {
       base: resolvedBase,
       breakpoints: resolvedBreakpoints,
       mode, opacity,
-      rowColor: rowColor ?? DEFAULTS.rowColor,
-      rowOpacity: rowOpacity ?? DEFAULTS.rowOpacity,
+      rowsColor: rowsColor ?? DEFAULTS.rowsColor,
+      rowsOpacity: rowsOpacity ?? DEFAULTS.rowsOpacity,
     };
     this._shortcut = this._parseShortcut(this._options.shortcut);
     this._wrapper = null;
@@ -141,7 +141,7 @@ class Folie {
 
   _injectStyles() {
     this._styleEl = document.createElement("style");
-    this._styleEl.textContent = [".fl-wrapper {", "  position: fixed;", "  inset: 0;", "  pointer-events: none;", "  display: grid;", "  grid-template-columns: repeat(var(--fl-columns), 1fr);", "  gap: var(--fl-gutter);", "  padding: 0 var(--fl-margin);", "}", ".fl-col {", "  height: 100%;", "  background: var(--fl-color);", "  opacity: var(--fl-opacity);", "}", ".fl-row-wrapper {", "  position: fixed;", "  inset: 0;", "  pointer-events: none;", "  display: grid;", "  grid-template-rows: repeat(var(--fl-rows), 1fr);", "  gap: var(--fl-row-gutter);", "  padding: var(--fl-row-margin) 0;", "}", ".fl-row {", "  width: 100%;", "  background: var(--fl-row-color);", "  opacity: var(--fl-row-opacity);", "}", ".fl-toggle {", "  position: fixed;", "  bottom: 0px;", "  left: 0px;", "  width: 40px;", "  height: 40px;", "  background: var(--fl-color);", "  opacity: 0.5;", "  border: none;", "  cursor: pointer;", "  padding: 0;", `  z-index: ${this._options.zIndex};`, "}", ".fl-wrapper[data-fl-mode=\"outline\"] .fl-col {", "  background: transparent;", "  box-shadow: inset 1px 0 0 0 var(--fl-color), inset -1px 0 0 0 var(--fl-color);", "}"].join("\n");
+    this._styleEl.textContent = [".fl-wrapper {", "  position: fixed;", "  inset: 0;", "  pointer-events: none;", "  display: grid;", "  grid-template-columns: repeat(var(--fl-columns), 1fr);", "  gap: var(--fl-gutter);", "  padding: 0 var(--fl-margin);", "}", ".fl-col {", "  height: 100%;", "  background: var(--fl-color);", "  opacity: var(--fl-opacity);", "}", ".fl-row-wrapper {", "  position: fixed;", "  inset: 0;", "  pointer-events: none;", "  display: grid;", "  grid-template-rows: repeat(var(--fl-rows), 1fr);", "  gap: var(--fl-rows-gutter);", "  padding: var(--fl-rows-margin) 0;", "}", ".fl-row {", "  width: 100%;", "  background: var(--fl-rows-color);", "  opacity: var(--fl-rows-opacity);", "}", ".fl-toggle {", "  position: fixed;", "  bottom: 0px;", "  left: 0px;", "  width: 40px;", "  height: 40px;", "  background: var(--fl-color);", "  opacity: 0.5;", "  border: none;", "  cursor: pointer;", "  padding: 0;", `  z-index: ${this._options.zIndex};`, "}", ".fl-wrapper[data-fl-mode=\"outline\"] .fl-col {", "  background: transparent;", "  box-shadow: inset 1px 0 0 0 var(--fl-color), inset -1px 0 0 0 var(--fl-color);", "}"].join("\n");
     document.head.appendChild(this._styleEl);
   }
 
@@ -221,10 +221,10 @@ class Folie {
     if (this._rowWrapper && cfg.rows !== undefined) {
       const rs = this._rowWrapper.style;
       rs.setProperty("--fl-rows", String(cfg.rows));
-      rs.setProperty("--fl-row-gutter", cfg.rowsGutter);
-      rs.setProperty("--fl-row-margin", cfg.rowsMargin);
-      rs.setProperty("--fl-row-color", this._options.rowColor);
-      rs.setProperty("--fl-row-opacity", String(this._options.rowOpacity));
+      rs.setProperty("--fl-rows-gutter", cfg.rowsGutter);
+      rs.setProperty("--fl-rows-margin", cfg.rowsMargin);
+      rs.setProperty("--fl-rows-color", this._options.rowsColor);
+      rs.setProperty("--fl-rows-opacity", String(this._options.rowsOpacity));
 
       if (this._rowWrapper.childElementCount !== cfg.rows) {
         const frag = document.createDocumentFragment();
